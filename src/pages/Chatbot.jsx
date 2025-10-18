@@ -18,7 +18,10 @@ const Chatbot = () => {
   };
 
   useEffect(() => {
-    setMessages([{ text: "Hello! I'm your AI learning companion. How can I help you learn something new today?", isBot: true }]);
+    setMessages([{ 
+      text: "Hey there! 👋 I'm EduBot, your friendly study companion! I'm here to help you with:\n\n📚 Understanding tough concepts\n💻 Learning to code\n🎯 Career guidance\n✨ Study tips & strategies\n\nWhat would you like to learn about today?", 
+      isBot: true 
+    }]);
   }, []);
 
   useEffect(() => {
@@ -44,10 +47,20 @@ const Chatbot = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
   
+      // Build chat history for context (last 10 messages, excluding welcome message)
+      const chatHistory = messages
+        .slice(1) // Skip the first welcome message
+        .slice(-10) // Get last 10 messages
+        .filter(msg => !msg.isBot || msg.text !== messages[0].text) // Exclude any welcome messages
+        .map(msg => ({
+          role: msg.isBot ? 'model' : 'user',
+          parts: [{ text: msg.text }]
+        }));
+
       const response = await fetch(`${apiUrl}/api/chatbot/ask`, {
         method: 'POST',
         headers: headers,
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: input, chatHistory }),
       });
   
       if (!response.ok) {
@@ -177,7 +190,7 @@ const Chatbot = () => {
                       sendMessage();
                     }
                   }}
-                  placeholder="Ask me anything about learning, concepts, or any topic you'd like to explore..."
+                  placeholder="Ask me about studying, programming, career advice, or any educational topic..."
                   className="chat-input w-full p-4 border-0 resize-none focus:outline-none bg-gray-50 dark:bg-gray-700 rounded-xl text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[60px] max-h-[120px]"
                   rows="2"
                 />

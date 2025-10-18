@@ -1,8 +1,19 @@
-# React + Vite
+# Edunova Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for Edunova.
 
-Currently, two official plugins are available:
+Quick start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```powershell
+cd C:\Users\yoges\Desktop\Projects\Edunova\EdunovaFrontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 after starting the frontend.
+
+## Features
+- React + Vite for fast development
+- Tailwind CSS for styling
+- Calls the Node.js backend which uses Google Gemini AI to generate personalized learning roadmaps
+- Includes YouTube video recommendations and hands-on projects for each week

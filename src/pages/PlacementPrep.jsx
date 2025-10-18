@@ -23,6 +23,9 @@ const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const PlacementPrep = () => {
   const [companyName, setCompanyName] = useState('');
+  const [companySuggestions, setCompanySuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [role, setRole] = useState('');
   const [customRole, setCustomRole] = useState('');
   const [questions, setQuestions] = useState([]);
@@ -34,6 +37,33 @@ const PlacementPrep = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('questions'); // 'questions' or 'concepts'
+
+  // Debounced company search
+  useEffect(() => {
+    const searchCompanies = async () => {
+      if (companyName.trim().length < 2) {
+        setCompanySuggestions([]);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const response = await fetch(`${apiUrl}/api/placement/companies/search?query=${encodeURIComponent(companyName)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setCompanySuggestions(data.companies || []);
+          setShowSuggestions(true);
+        }
+      } catch (error) {
+        console.error('Error searching companies:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timer = setTimeout(searchCompanies, 300);
+    return () => clearTimeout(timer);
+  }, [companyName]);
 
   const generatePlacementContent = async () => {
     if (!companyName.trim()) {
@@ -172,19 +202,51 @@ const PlacementPrep = () => {
             Choose Your Target Company & Role
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
+            <div className="relative">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Company Name
               </label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && generatePlacementContent()}
-                placeholder="e.g., Google, Microsoft, Amazon, TCS, Infosys..."
-                className="w-full p-4 border-0 bg-gray-50 dark:bg-gray-700 rounded-xl text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => {
+                    setCompanyName(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onKeyPress={(e) => e.key === 'Enter' && !showSuggestions && generatePlacementContent()}
+                  onFocus={() => companySuggestions.length > 0 && setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  placeholder="Type to search companies..."
+                  className="w-full p-4 border-0 bg-gray-50 dark:bg-gray-700 rounded-xl text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isLoading}
+                  autoComplete="off"
+                />
+                {isSearching && (
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <Loader className="w-4 h-4 animate-spin text-blue-500" />
+                  </div>
+                )}
+              </div>
+              
+              {/* Autocomplete Dropdown */}
+              {showSuggestions && companySuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-y-auto">
+                  {companySuggestions.map((company, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        setCompanyName(company);
+                        setShowSuggestions(false);
+                      }}
+                      className="px-4 py-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer transition-colors flex items-center"
+                    >
+                      <Building2 className="w-4 h-4 mr-2 text-blue-500" />
+                      <span className="text-gray-800 dark:text-white">{company}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
