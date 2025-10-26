@@ -22,6 +22,10 @@ dist-ssr
 .env.*.local
 *.local
 
+# Keep these files for deployment reference
+!.env.example
+!.env.production
+
 # IDE & Editor
 .vscode/*
 !.vscode/extensions.json
