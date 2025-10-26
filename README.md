@@ -298,7 +298,7 @@ For support, please open an issue in the repository or contact the maintainers.
 
 ---
 
-**Live Demo**: [https://edunova-frontend.onrender.com](https://edunova-frontend.onrender.com)  
+**Live Demo**: [https://edunovafrontend.onrender.com](https://edunovafrontend.onrender.com)  
 **Backend**: [https://edunovabackend.onrender.com](https://edunovabackend.onrender.com)
 
 Made with ❤️ by the Edunova Team

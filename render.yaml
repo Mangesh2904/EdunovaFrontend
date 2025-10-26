@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: edunova-frontend
+    name: edunovafrontend
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
